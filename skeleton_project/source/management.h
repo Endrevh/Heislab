@@ -22,6 +22,8 @@ int managementElevatorAtFloor(void); //sjekker om heisen er ved en etasje.
 void managementStopAtFloor(int floor); //sjekker om heisen skal stoppe ved gitt etasje. Må se om noen skal av, eller om noen skal på i den retningen heisen er på vei (bruk state til å sjekke dette)
                                         //kalles når vi går forbi en etasje                                       
                                         //bytte state
+                                        //må aldri gå lenger ned enn nederste request, og motsatt. Dette kunne skjedd dersom man er i idle,
+                                        //får en request lenger nede som skal opp. Da vil heisen begynne å gå nedover selv om det er ingen lenger nede som skal ned eller av.
                                        
 
 
