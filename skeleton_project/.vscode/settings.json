@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "queuesystem.h": "c",
+        "ctime": "cpp"
+    }
+}

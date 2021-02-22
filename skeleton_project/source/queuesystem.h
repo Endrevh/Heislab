@@ -1,5 +1,6 @@
 #include "management.h"
 #include "hardware.h"
+#include "stdlib.h"
 
 #ifndef QUEUESYSTEM_H
 #define QUEUESYSTEM_H
@@ -24,12 +25,21 @@ typedef struct
 
 command Queue[HARDWARE_NUMBER_OF_FLOORS];
 
+void queuesystemCheckButtons();
 
-void queueRequestHandler(request* p_request);
+int queuesystemRequestBetween(int floor_lower, int floor_upper);
 
-void queueDelete(int floor);
+void queuesystemRequestHandler(request* p_request);
 
-elevator_state queueNewDirection(); 
+void queuesystemDelete(int floor);
 
+elevator_state queuesystemNewDir(); //denne må kalles ETTER 3 sekunder stopp ved etasje
+
+void queuesystemStopAtFloor(int floor);  //sjekker om heisen skal stoppe ved gitt etasje. Må se om noen skal av, eller om noen skal på i den retningen heisen er på vei (bruk state til å sjekke dette)
+                                        //kalles når vi går forbi en etasje                                       
+                                        //bytte state
+                                        //må aldri gå lenger ned enn nederste request, og motsatt. Dette kunne skjedd dersom man er i idle,
+                                        //får en request lenger nede som skal opp. Da vil heisen begynne å gå nedover selv om det er ingen lenger nede som skal ned eller av.
+                                        //foreslått løsning: sjekke om det er noen requests i etasjene under. Hvis ja, fortsett nedover. Sett opp et eksempel med dette, se hva som fungerer. Kanskje ha en bool variabel som settes til true/false når første idle-request er fullført
 #endif
 
