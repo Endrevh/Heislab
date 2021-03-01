@@ -39,6 +39,7 @@ int main(){
     }
     state = STATE_STARTUP;
     clear_all_order_lights();
+    hardware_command_door_open(0);
 
     printf("=== Example Program ===\n");
     printf("Press the stop button on the elevator panel to exit\n");
@@ -46,15 +47,17 @@ int main(){
 
 
     while(1){
-        /*if(hardware_read_stop_signal()){
-            printf("QWERQWER");
+        if(hardware_read_stop_signal()){
+            timerReset();
+            clear_all_order_lights();
+            hardware_command_stop_light(1);
             hardware_command_movement(HARDWARE_MOVEMENT_STOP);
             for(int i = 0; i < HARDWARE_NUMBER_OF_FLOORS; i++) {
                 queuesystemDelete(i+1);
             }
-            state = STATE_IDLE;
-            break;
-        }*/
+            if(state == STATE_DOWN) current_floor--; //to prevent undefined state after stop
+            state = STATE_EMERGENCY_STOP;
+        }
 
         switch (state)
         {
@@ -77,9 +80,11 @@ int main(){
             break;
         case STATE_DOWN_HALT:
             //obstruction
+            if(hardware_read_obstruction_signal()){
+                timerReset();
+            }
             hardware_command_movement(HARDWARE_MOVEMENT_STOP);
-            if(timerTrigger(3)) {
-                printf("KOMMET TIL ETASJE");
+            if(timerTrigger(FLOOR_WAIT_TIME)) {
                 managementDepart(current_floor);
                 state = queuesystemNewDir();
             }
@@ -87,21 +92,38 @@ int main(){
             break;
         case STATE_UP_HALT:
             //obstruction
+            if(hardware_read_obstruction_signal()){
+                timerReset();
+            }
             hardware_command_movement(HARDWARE_MOVEMENT_STOP);
-            if(timerTrigger(3)) {
+            if(timerTrigger(FLOOR_WAIT_TIME)) {
                 managementDepart(current_floor);
                 state = queuesystemNewDir();
             }
             queuesystemCheckButtons();
             break;
         case STATE_IDLE:
-            //obstruction??
+            if(timerTrigger(FLOOR_WAIT_TIME)) {
+                hardware_command_door_open(0);
+            } 
             hardware_command_movement(HARDWARE_MOVEMENT_STOP);
             queuesystemCheckButtons();
+            break;
+        case STATE_EMERGENCY_STOP:
+            if(managementElevatorAtFloor()){
+                if(timerTrigger(FLOOR_WAIT_TIME)) {
+                    hardware_command_door_open(0);
+                }
+                else{
+                    hardware_command_door_open(1);
+                }
+            }
+            if(!hardware_read_stop_signal()) queuesystemCheckButtons();
             break;
         default:
             break;
         }
+
         
         
 
@@ -147,13 +169,13 @@ int main(){
         }
 
         /* Code to clear all lights given the obstruction signal */
-        if(hardware_read_obstruction_signal()){
+        /*if(hardware_read_obstruction_signal()){
             hardware_command_stop_light(1);
             clear_all_order_lights();
         }
         else{
             hardware_command_stop_light(0);
-        }
+        }*/
     }
 
     return 0;

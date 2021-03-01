@@ -17,15 +17,12 @@ int managementElevatorAtFloor(void) {
 }
 
 void managementArrived(int floor) {
-
     timerReset();
-    printf("KOMMET TIL ETASJE");
-
-
+    hardware_command_door_open(1);
+    
     for(int i = 0; i < NUMBER_OF_ORDER_TYPES; i++) {
-        hardware_command_order_light(floor, i, 0);
+        hardware_command_order_light(floor-1, i, 0);
     }
-
 }
 
 void managementDepart(int floor) {

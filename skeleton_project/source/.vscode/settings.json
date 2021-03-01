@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "queuesystem.h": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "memory.h": "c"
     }
 }

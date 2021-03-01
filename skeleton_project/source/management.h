@@ -1,7 +1,7 @@
 #ifndef MANAGEMENT_H
 #define MANAGEMENT_H
 
-
+#define FLOOR_WAIT_TIME 3
 
 typedef enum {
     STATE_STARTUP = 1,
@@ -9,7 +9,8 @@ typedef enum {
     STATE_UP_HALT,
     STATE_DOWN,
     STATE_DOWN_HALT,
-    STATE_IDLE
+    STATE_IDLE,
+    STATE_EMERGENCY_STOP
 } elevator_state;
 
 elevator_state state;

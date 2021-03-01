@@ -191,3 +191,4 @@ void hardware_command_order_light(int floor, HardwareOrder order_type, int on){
         io_clear_bit(light_bit_lookup[floor][type_bit]);
     }
 }
+

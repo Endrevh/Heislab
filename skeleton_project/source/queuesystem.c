@@ -1,4 +1,5 @@
 #include "queuesystem.h"
+#include "timer.h"
 
 
 #include "stdio.h"
@@ -7,16 +8,41 @@
 void queuesystemRequestHandler(request* p_request) { //hvis vi er i idle, settes direction (state) med en gang i retning etasjen vi fikk request fra
     int requested_floor = p_request->floor;
     orderType order = p_request->order;
-    if(state == STATE_IDLE) {
-        if(requested_floor == current_floor) hardware_command_door_open(1);   
-        else if(requested_floor < current_floor) {
+    switch (state)
+    {
+    case STATE_IDLE:
+            if(requested_floor == current_floor){
+                timerReset();
+                hardware_command_door_open(1);
+                for(int i = 0; i < NUMBER_OF_ORDER_TYPES; i++) {
+                    hardware_command_order_light(requested_floor-1, i, 0);
+                }
+            }
+            else if(requested_floor < current_floor){
+                state = STATE_DOWN;
+                managementDepart(current_floor);
+            }
+            else{
+                state = STATE_UP;
+                managementDepart(current_floor);
+            }
+        break;
+    case STATE_EMERGENCY_STOP:
+        if(managementElevatorAtFloor() && requested_floor == current_floor) {
+            state = STATE_IDLE;
+            hardware_command_door_open(1);
+            timerReset();
+        } 
+        else if(requested_floor <= current_floor) {
             state = STATE_DOWN;
-            managementDepart(current_floor);
+            hardware_command_door_open(0);
         }
         else {
             state = STATE_UP;
-            managementDepart(current_floor);
+            hardware_command_door_open(0);
         }
+    default:
+        break;
     }
     Queue[requested_floor-1].p_orderTypes[order] = 1;
 }
@@ -36,7 +62,7 @@ void queuesystemStopAtFloor(int floor) {
     {
     case STATE_UP:
         //sjekker for requests fra etasjer over
-        //stopper hvis det ikke er noen requests over, eller noen skal av eller oppover
+        //stopper hvis det et ikke er noen requests over, eller noen skal av eller oppover
         if(Queue[floor-1].p_orderTypes[ORDER_UP] == 1 || Queue[floor-1].p_orderTypes[ORDER_INSIDE] == 1 || !requestsAbove) {
             state = STATE_UP_HALT;
             managementArrived(floor);
@@ -66,8 +92,10 @@ int queuesystemRequestBetween(int floor_lower, int floor_upper) {
 
 
 elevator_state queuesystemNewDir() {
-    if(!queuesystemRequestBetween(1, HARDWARE_NUMBER_OF_FLOORS)) return STATE_IDLE;
-
+    if(!queuesystemRequestBetween(1, HARDWARE_NUMBER_OF_FLOORS)) {
+        hardware_command_door_open(0);
+        return STATE_IDLE;
+    }
     switch (state)
     {
     case STATE_UP_HALT:
