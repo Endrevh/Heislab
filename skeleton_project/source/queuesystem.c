@@ -28,42 +28,65 @@ void queuesystemRequestHandler(request* p_request) { //hvis vi er i idle, settes
             }
         break;
     case STATE_EMERGENCY_STOP:
-        if(managementElevatorAtFloor() && requested_floor == current_floor) {
-            state = STATE_IDLE;
-            hardware_command_door_open(1);
-            timerReset();
-        } 
-        else if(requested_floor <= current_floor) {
-            state = STATE_DOWN;
-            hardware_command_door_open(0);
-        }
-        else {
-            state = STATE_UP;
-            hardware_command_door_open(0);
+        switch(emergency_status)
+        {
+        case EMERGENCY_HANDLED:
+            if(requested_floor == current_floor) {
+                state = STATE_IDLE;
+                hardware_command_door_open(1);
+                timerReset();
+            }
+            else if(requested_floor > current_floor) {
+                state = STATE_UP;
+                hardware_command_door_open(0);
+            }
+            else if (requested_floor < current_floor){
+                state = STATE_DOWN;
+                hardware_command_door_open(0);
+            }
+            break;
+        case EMERGENCY_UP: //this means that the elevator is above the last detected floor
+            if(requested_floor <= current_floor) {
+                state = STATE_DOWN;
+                hardware_command_door_open(0);
+            }
+            else {
+                state = STATE_UP;
+                hardware_command_door_open(0);
+            }
+            break;
+        case EMERGENCY_DOWN:
+            if(requested_floor >= current_floor) {
+                state = STATE_UP;
+                hardware_command_door_open(0);
+            }
+            else {
+                state = STATE_DOWN;
+                hardware_command_door_open(0);
+            }
+            break;
         }
     default:
         break;
     }
-    Queue[requested_floor-1].p_orderTypes[order] = 1;
+    Queue[requested_floor-1].p_orderTypes[order] = true;
 }
 
-void queuesystemDelete(int floor) {
+void queuesystemDelFromQueue(int floor) {
     for(int i = 0; i < NUMBER_OF_ORDER_TYPES; i++) {
-            Queue[floor-1].p_orderTypes[i] = 0;
+            Queue[floor-1].p_orderTypes[i] = false;
     }
 }
 
 
 void queuesystemStopAtFloor(int floor) {
     if(!floor) return;
-    int requestsAbove = queuesystemRequestBetween(floor+1, HARDWARE_NUMBER_OF_FLOORS);
-    int requestsBelow = queuesystemRequestBetween(1, floor-1);
+    bool requestsAbove = queuesystemRequestBetween(floor+1, HARDWARE_NUMBER_OF_FLOORS);
+    bool requestsBelow = queuesystemRequestBetween(1, floor-1);
     switch (state)
     {
     case STATE_UP:
-        //sjekker for requests fra etasjer over
-        //stopper hvis det et ikke er noen requests over, eller noen skal av eller oppover
-        if(Queue[floor-1].p_orderTypes[ORDER_UP] == 1 || Queue[floor-1].p_orderTypes[ORDER_INSIDE] == 1 || !requestsAbove) {
+        if(Queue[floor-1].p_orderTypes[ORDER_UP] == true || Queue[floor-1].p_orderTypes[ORDER_INSIDE] == true || requestsAbove == false) {
             state = STATE_UP_HALT;
             managementArrived(floor);
         }
@@ -71,7 +94,7 @@ void queuesystemStopAtFloor(int floor) {
     case STATE_DOWN:
         //sjekker for requests fra etasjer lenger nede
         //stopper hvis det ikke er noen requests under, eller noen skal av eller nedover
-        if(Queue[floor-1].p_orderTypes[ORDER_DOWN] == 1 || Queue[floor-1].p_orderTypes[ORDER_INSIDE] == 1 || !requestsBelow) {
+        if(Queue[floor-1].p_orderTypes[ORDER_DOWN] == true || Queue[floor-1].p_orderTypes[ORDER_INSIDE] == true || requestsBelow == false) {
             state = STATE_DOWN_HALT;
             managementArrived(floor);
         }
@@ -81,8 +104,8 @@ void queuesystemStopAtFloor(int floor) {
     }
 }
 
-int queuesystemRequestBetween(int floor_lower, int floor_upper) {
-    int requestsBetween = 0;
+bool queuesystemRequestBetween(int floor_lower, int floor_upper) {
+    bool requestsBetween = false;
     for(int i = floor_lower-1; i < floor_upper; i++) {
         requestsBetween = requestsBetween || (Queue[i].p_orderTypes[ORDER_UP] || Queue[i].p_orderTypes[ORDER_INSIDE] || Queue[i].p_orderTypes[ORDER_DOWN]);
     }
@@ -112,7 +135,7 @@ elevator_state queuesystemNewDir() {
         else return STATE_UP;
         }    
     default:
-        return 69;
+        return 69; //this never happens.
         break;
     }
 }

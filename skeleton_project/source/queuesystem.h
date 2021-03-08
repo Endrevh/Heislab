@@ -1,6 +1,7 @@
 #include "management.h"
 #include "hardware.h"
 #include "stdlib.h"
+#include <stdbool.h>
 
 #ifndef QUEUESYSTEM_H
 #define QUEUESYSTEM_H
@@ -14,7 +15,7 @@ typedef enum {
 
 typedef struct
 {
-   int p_orderTypes[NUMBER_OF_ORDER_TYPES];
+   bool p_orderTypes[NUMBER_OF_ORDER_TYPES];
 } command;
 
 typedef struct
@@ -27,11 +28,11 @@ command Queue[HARDWARE_NUMBER_OF_FLOORS];
 
 void queuesystemCheckButtons();
 
-int queuesystemRequestBetween(int floor_lower, int floor_upper);
+bool queuesystemRequestBetween(int floor_lower, int floor_upper);
 
 void queuesystemRequestHandler(request* p_request);
 
-void queuesystemDelete(int floor);
+void queuesystemDelFromQueue(int floor);
 
 elevator_state queuesystemNewDir(); //denne må kalles ETTER 3 sekunder stopp ved etasje
 

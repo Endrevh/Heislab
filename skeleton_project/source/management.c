@@ -10,6 +10,7 @@ int managementElevatorAtFloor(void) {
     for(int i = 0; i < HARDWARE_NUMBER_OF_FLOORS; i++) {
         if(hardware_read_floor_sensor(i)) {
             current_floor = i+1;
+            emergency_status = EMERGENCY_HANDLED;
             return i+1;
         } 
     }
@@ -23,9 +24,14 @@ void managementArrived(int floor) {
     for(int i = 0; i < NUMBER_OF_ORDER_TYPES; i++) {
         hardware_command_order_light(floor-1, i, 0);
     }
+
 }
 
 void managementDepart(int floor) {
     hardware_command_door_open(0);
-    queuesystemDelete(floor); 
+    queuesystemDelFromQueue(floor); 
+    
+    for(int i = 0; i < NUMBER_OF_ORDER_TYPES; i++) {
+        hardware_command_order_light(floor-1, i, 0);
+    }
 }

@@ -30,14 +30,13 @@ static void clear_all_order_lights(){
 
 int main(){
 
-    
-
     int error = hardware_init();
     if(error != 0){
         fprintf(stderr, "Unable to initialize hardware\n");
         exit(1);
     }
     state = STATE_STARTUP;
+    emergency_status = EMERGENCY_HANDLED;
     clear_all_order_lights();
     hardware_command_door_open(0);
 
@@ -46,17 +45,35 @@ int main(){
 
 
 
+
     while(1){
+
         if(hardware_read_stop_signal()){
             timerReset();
             clear_all_order_lights();
             hardware_command_stop_light(1);
             hardware_command_movement(HARDWARE_MOVEMENT_STOP);
             for(int i = 0; i < HARDWARE_NUMBER_OF_FLOORS; i++) {
-                queuesystemDelete(i+1);
+                queuesystemDelFromQueue(i+1);
             }
-            if(state == STATE_DOWN) current_floor--; //to prevent undefined state after stop
+            if(emergency_status == EMERGENCY_HANDLED) {
+                switch (state)
+                {
+                case STATE_UP:
+                    emergency_status = EMERGENCY_UP;
+                    break;
+                case STATE_DOWN:
+                    emergency_status = EMERGENCY_DOWN;
+                    break;
+                case STATE_STARTUP:
+                    emergency_status = EMERGENCY_DOWN;
+                default:
+                    emergency_status = EMERGENCY_HANDLED;
+                    break;
+                }
+            }
             state = STATE_EMERGENCY_STOP;
+            //TRENGER NY LOGIKK
         }
 
         switch (state)
@@ -79,7 +96,6 @@ int main(){
             }
             break;
         case STATE_DOWN_HALT:
-            //obstruction
             if(hardware_read_obstruction_signal()){
                 timerReset();
             }
@@ -91,7 +107,6 @@ int main(){
             queuesystemCheckButtons();
             break;
         case STATE_UP_HALT:
-            //obstruction
             if(hardware_read_obstruction_signal()){
                 timerReset();
             }
@@ -118,7 +133,9 @@ int main(){
                     hardware_command_door_open(1);
                 }
             }
-            if(!hardware_read_stop_signal()) queuesystemCheckButtons();
+            if(!hardware_read_stop_signal()) {
+                hardware_command_stop_light(0);
+                queuesystemCheckButtons();}
             break;
         default:
             break;
