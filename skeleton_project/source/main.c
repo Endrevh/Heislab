@@ -56,24 +56,9 @@ int main(){
             for(int i = 0; i < HARDWARE_NUMBER_OF_FLOORS; i++) {
                 queuesystemDelFromQueue(i+1);
             }
-            if(emergency_status == EMERGENCY_HANDLED) {
-                switch (state)
-                {
-                case STATE_UP:
-                    emergency_status = EMERGENCY_UP;
-                    break;
-                case STATE_DOWN:
-                    emergency_status = EMERGENCY_DOWN;
-                    break;
-                case STATE_STARTUP:
-                    emergency_status = EMERGENCY_DOWN;
-                default:
-                    emergency_status = EMERGENCY_HANDLED;
-                    break;
-                }
             }
-            state = STATE_EMERGENCY_STOP;
             //TRENGER NY LOGIKK
+            controllerEmergencyHandler();
         }
 
         switch (state)
