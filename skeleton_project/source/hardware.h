@@ -7,6 +7,7 @@
  *
  * Kolbjørn Austreng
  */
+
 #ifndef HARDWARE_H
 #define HARDWARE_H
 #define HARDWARE_NUMBER_OF_FLOORS 4
@@ -38,7 +39,11 @@ typedef enum {
  *
  * @return 0 on success. Non-zero for failure.
  */
+
+
 int hardware_init();
+
+
 
 /**
  * @brief Commands the elevator to either move up or down,

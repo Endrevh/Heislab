@@ -67,6 +67,8 @@ int hardware_init(){
     return 0;
 }
 
+
+
 void hardware_command_movement(HardwareMovement movement){
     switch(movement){
         case HARDWARE_MOVEMENT_UP:
