@@ -2,7 +2,7 @@
 #include <stdbool.h>
 
 
-time_t timestamp;
+clock_t timestamp;
 
 //returns true if timer has elapsed more than {trigger} seconds
 bool timerTrigger(int trigger);
