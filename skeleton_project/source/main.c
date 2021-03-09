@@ -4,8 +4,7 @@
 #include "hardware.h"
 #include "driver/io.h"
 #include "driver/channels.h"
-#include "management.h"
-#include "queuesystem.h"
+#include "controller.h"
 #include "timer.h"
 
 //bytt alle ints med bools senere
@@ -37,6 +36,7 @@ int main(){
     }
     state = STATE_STARTUP;
     emergency_status = EMERGENCY_HANDLED;
+
     clear_all_order_lights();
     hardware_command_door_open(0);
 
@@ -54,10 +54,8 @@ int main(){
             hardware_command_stop_light(1);
             hardware_command_movement(HARDWARE_MOVEMENT_STOP);
             for(int i = 0; i < HARDWARE_NUMBER_OF_FLOORS; i++) {
-                queuesystemDelFromQueue(i+1);
+                controllerDelFromQueue(i+1);
             }
-            }
-            //TRENGER NY LOGIKK
             controllerEmergencyHandler();
         }
 
@@ -65,18 +63,18 @@ int main(){
         {
         case STATE_UP:
             hardware_command_movement(HARDWARE_MOVEMENT_UP);
-            queuesystemStopAtFloor(managementElevatorAtFloor());
-            queuesystemCheckButtons();
+            controllerStopAtFloor(controllerElevatorAtFloor());
+            controllerCheckOrderBtns();
             break;
         
         case STATE_DOWN:
             hardware_command_movement(HARDWARE_MOVEMENT_DOWN);
-            queuesystemStopAtFloor(managementElevatorAtFloor());
-            queuesystemCheckButtons();
+            controllerStopAtFloor(controllerElevatorAtFloor());
+            controllerCheckOrderBtns();
             break;
         case STATE_STARTUP:
             hardware_command_movement(HARDWARE_MOVEMENT_DOWN);
-            if(managementElevatorAtFloor()) {
+            if(controllerElevatorAtFloor()) {
                 state = STATE_IDLE;
             }
             break;
@@ -86,10 +84,10 @@ int main(){
             }
             hardware_command_movement(HARDWARE_MOVEMENT_STOP);
             if(timerTrigger(FLOOR_WAIT_TIME)) {
-                managementDepart(current_floor);
-                state = queuesystemNewDir();
+                controllerDepart();
+                state = controllerNewDir();
             }
-            queuesystemCheckButtons();
+            controllerCheckOrderBtns();
             break;
         case STATE_UP_HALT:
             if(hardware_read_obstruction_signal()){
@@ -97,20 +95,20 @@ int main(){
             }
             hardware_command_movement(HARDWARE_MOVEMENT_STOP);
             if(timerTrigger(FLOOR_WAIT_TIME)) {
-                managementDepart(current_floor);
-                state = queuesystemNewDir();
+                controllerDepart();
+                state = controllerNewDir();
             }
-            queuesystemCheckButtons();
+            controllerCheckOrderBtns();
             break;
         case STATE_IDLE:
             if(timerTrigger(FLOOR_WAIT_TIME)) {
                 hardware_command_door_open(0);
             } 
             hardware_command_movement(HARDWARE_MOVEMENT_STOP);
-            queuesystemCheckButtons();
+            controllerCheckOrderBtns();
             break;
         case STATE_EMERGENCY_STOP:
-            if(managementElevatorAtFloor()){
+            if(controllerElevatorAtFloor()){
                 if(timerTrigger(FLOOR_WAIT_TIME)) {
                     hardware_command_door_open(0);
                 }
@@ -120,7 +118,7 @@ int main(){
             }
             if(!hardware_read_stop_signal()) {
                 hardware_command_stop_light(0);
-                queuesystemCheckButtons();}
+                controllerCheckOrderBtns();}
             break;
         default:
             break;
