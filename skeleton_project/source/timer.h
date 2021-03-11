@@ -2,15 +2,34 @@
 #include <stdbool.h>
 
 
-clock_t timestamp;
+/**
+ * @brief Timer typedef. Contains timestamp used for comparing
+ */
+typedef struct
+{
+   clock_t timestamp;
+} Timer;
 
-//returns true if timer has elapsed more than {trigger} seconds
-bool timerTrigger(int trigger);
+Timer timer;
 
-//updates timestamp to current time
-void timerReset(void);
+/**
+ * @brief checks if timer has elapsed more than @p trigger seconds
+ * 
+ * @param timer_p pointer to timer
+ * @param trigger timer overflow threshold
+ * 
+ * @return returns true if timer has overflowed, false otherwise
+ */
+bool timerTrigger(Timer* timer_p, int trigger);
+
+/**
+ * @brief resets timer by setting @c timestamp to current time
+ * 
+ * @param timer we want to reset
+ */
+void timerReset(Timer* timer_p);
 
 
-//consider having a logic for activating/disabling the timer. Make a struct?
+
 
 

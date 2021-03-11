@@ -49,7 +49,7 @@ int main(){
     while(1){
 
         if(hardware_read_stop_signal()){
-            timerReset();
+            timerReset(&timer);
             clear_all_order_lights();
             hardware_command_stop_light(1);
             hardware_command_movement(HARDWARE_MOVEMENT_STOP);
@@ -80,10 +80,10 @@ int main(){
             break;
         case STATE_DOWN_HALT:
             if(hardware_read_obstruction_signal()){
-                timerReset();
+                timerReset(&timer);
             }
             hardware_command_movement(HARDWARE_MOVEMENT_STOP);
-            if(timerTrigger(FLOOR_WAIT_TIME)) {
+            if(timerTrigger(&timer, FLOOR_WAIT_TIME)) {
                 controllerDepart();
                 state = controllerNewDir();
             }
@@ -91,17 +91,17 @@ int main(){
             break;
         case STATE_UP_HALT:
             if(hardware_read_obstruction_signal()){
-                timerReset();
+                timerReset(&timer);
             }
             hardware_command_movement(HARDWARE_MOVEMENT_STOP);
-            if(timerTrigger(FLOOR_WAIT_TIME)) {
+            if(timerTrigger(&timer, FLOOR_WAIT_TIME)) {
                 controllerDepart();
                 state = controllerNewDir();
             }
             controllerCheckOrderBtns();
             break;
         case STATE_IDLE:
-            if(timerTrigger(FLOOR_WAIT_TIME)) {
+            if(timerTrigger(&timer, FLOOR_WAIT_TIME)) {
                 hardware_command_door_open(0);
             } 
             hardware_command_movement(HARDWARE_MOVEMENT_STOP);
@@ -109,7 +109,7 @@ int main(){
             break;
         case STATE_EMERGENCY_STOP:
             if(controllerElevatorAtFloor()){
-                if(timerTrigger(FLOOR_WAIT_TIME)) {
+                if(timerTrigger(&timer, FLOOR_WAIT_TIME)) {
                     hardware_command_door_open(0);
                 }
                 else{

@@ -2,16 +2,14 @@
 
 
 
-clock_t timestamp = 0;
 
-
-bool timerTrigger(int trigger) {
-    return((clock() - timestamp)/CLOCKS_PER_SEC >= trigger);
+bool timerTrigger(Timer* timer_p, int trigger) {
+    return((clock() - timer_p->timestamp)/CLOCKS_PER_SEC >= trigger);
 }
 
 
-void timerReset(void) {
-    timestamp = clock();
+void timerReset(Timer* timer_p) {
+    timer_p->timestamp = clock();
 }
 
 
