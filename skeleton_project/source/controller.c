@@ -42,11 +42,11 @@ void controllerRequestHandler(request* p_request) { //hvis vi er i idle, settes 
             }
             else if(requested_floor < current_floor){
                 state = STATE_DOWN;
-                controllerDepart(current_floor);
+                controllerDepart();
             }
             else{
                 state = STATE_UP;
-                controllerDepart(current_floor);
+                controllerDepart();
             }
         break;
     case STATE_EMERGENCY_STOP:
@@ -136,7 +136,7 @@ void controllerStopAtFloor(int floor) {
     case STATE_UP:
         if(Queue[floor-1].p_orderTypes[ORDER_UP] == true || Queue[floor-1].p_orderTypes[ORDER_INSIDE] == true || requestsAbove == false) {
             state = STATE_UP_HALT;
-            controllerArrived(floor);
+            controllerArrived();
         }
         break;
     case STATE_DOWN:
@@ -144,7 +144,7 @@ void controllerStopAtFloor(int floor) {
         //stopper hvis det ikke er noen requests under, eller noen skal av eller nedover
         if(Queue[floor-1].p_orderTypes[ORDER_DOWN] == true || Queue[floor-1].p_orderTypes[ORDER_INSIDE] == true || requestsBelow == false) {
             state = STATE_DOWN_HALT;
-            controllerArrived(floor);
+            controllerArrived();
         }
         break;
     default:

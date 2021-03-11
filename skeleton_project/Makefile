@@ -1,5 +1,5 @@
 SIM := false
-SOURCES := main.c queuesystem.c management.c timer.c
+SOURCES := main.c controller.c controller.c timer.c
 
 SOURCE_DIR := source
 BUILD_DIR := build
