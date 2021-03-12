@@ -7,8 +7,6 @@
 #include "controller.h"
 #include "timer.h"
 
-//bytt alle ints med bools senere
-//hvis vi er i en etasje, sjekk om obstruction blir true, reset timer
 //vurder å kjøre heisen til første etasje ved idle. 
 
 static void clear_all_order_lights(){
@@ -106,6 +104,7 @@ int main(){
             } 
             hardware_command_movement(HARDWARE_MOVEMENT_STOP);
             controllerCheckOrderBtns();
+            clear_all_order_lights();
             break;
         case STATE_EMERGENCY_STOP:
             if(controllerElevatorAtFloor()){
@@ -123,24 +122,7 @@ int main(){
         default:
             break;
         }
-
-        
-        
-
-        //Code block that makes the elevator go up when it reach the botton
-        /*if(hardware_read_floor_sensor(0)){
-            hardware_command_movement(HARDWARE_MOVEMENT_UP);
-        }*/
-
-        /*if(io_read_bit(BUTTON_UP1) == 1){
-            hardware_command_movement(HARDWARE_MOVEMENT_UP);
-        }*/
-
-        /* Code block that makes the elevator go down when it reach the top floor*/
-        /*if(hardware_read_floor_sensor(HARDWARE_NUMBER_OF_FLOORS - 1)){
-            hardware_command_movement(HARDWARE_MOVEMENT_DOWN);
-            state = STATE_DOWN;
-        }*/
+       
 
         /* All buttons must be polled, like this: */
         
@@ -151,31 +133,25 @@ int main(){
         }
 
         /* Lights are set and cleared like this: */
-        for(int f = 0; f < HARDWARE_NUMBER_OF_FLOORS; f++){
-            //Internal orders
-            if(hardware_read_order(f, HARDWARE_ORDER_INSIDE)){
-                hardware_command_order_light(f, HARDWARE_ORDER_INSIDE, 1);
-            }
+        if(!(state == STATE_STARTUP)) {
+            for(int f = 0; f < HARDWARE_NUMBER_OF_FLOORS; f++){
+                //Internal orders
+                if(hardware_read_order(f, HARDWARE_ORDER_INSIDE)){
+                   hardware_command_order_light(f, HARDWARE_ORDER_INSIDE, 1);
+                }
 
-            //Orders going up
-            if(hardware_read_order(f, HARDWARE_ORDER_UP)){
-                hardware_command_order_light(f, HARDWARE_ORDER_UP, 1);
-            }
+                //Orders going up
+                if(hardware_read_order(f, HARDWARE_ORDER_UP)){
+                    hardware_command_order_light(f, HARDWARE_ORDER_UP, 1);
+                    }
 
-            //Orders going down
-            if(hardware_read_order(f, HARDWARE_ORDER_DOWN)){
-                hardware_command_order_light(f, HARDWARE_ORDER_DOWN, 1);
+                //Orders going down
+                if(hardware_read_order(f, HARDWARE_ORDER_DOWN)){
+                    hardware_command_order_light(f, HARDWARE_ORDER_DOWN, 1);
+                }
             }
         }
-
-        /* Code to clear all lights given the obstruction signal */
-        /*if(hardware_read_obstruction_signal()){
-            hardware_command_stop_light(1);
-            clear_all_order_lights();
-        }
-        else{
-            hardware_command_stop_light(0);
-        }*/
+       
     }
 
     return 0;

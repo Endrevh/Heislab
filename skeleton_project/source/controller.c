@@ -27,7 +27,7 @@ bool controllerRequestBetween(int floor_lower, int floor_upper) {
     return requestsBetween;
 }
 
-void controllerRequestHandler(request* p_request) { //hvis vi er i idle, settes direction (state) med en gang i retning etasjen vi fikk request fra
+void controllerRequestHandler(request* p_request) { 
     int requested_floor = p_request->floor;
     orderType order = p_request->order;
     switch (state)
@@ -67,7 +67,7 @@ void controllerRequestHandler(request* p_request) { //hvis vi er i idle, settes 
                 hardware_command_door_open(0);
             }
             break;
-        case EMERGENCY_ABOVE: //this means that the elevator is above the last detected floor
+        case EMERGENCY_ABOVE:
             if(requested_floor <= current_floor) {
                 state = STATE_DOWN;
                 hardware_command_door_open(0);
@@ -140,8 +140,6 @@ void controllerStopAtFloor(int floor) {
         }
         break;
     case STATE_DOWN:
-        //sjekker for requests fra etasjer lenger nede
-        //stopper hvis det ikke er noen requests under, eller noen skal av eller nedover
         if(Queue[floor-1].p_orderTypes[ORDER_DOWN] == true || Queue[floor-1].p_orderTypes[ORDER_INSIDE] == true || requestsBelow == false) {
             state = STATE_DOWN_HALT;
             controllerArrived();
@@ -173,8 +171,6 @@ void controllerDepart(void) {
     }
 }
 
-//called whenever the emergencybutton is clicked. Checks if the elevator is already handling an emergency,
-//and changes elevator state
 void controllerEmergencyHandler(void) {
     if(emergency_status == EMERGENCY_HANDLED) {
         switch (state) {
