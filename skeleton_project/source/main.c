@@ -46,7 +46,7 @@ int main(){
 
     while(1){
 
-        if(hardware_read_stop_signal()){
+        if(hardware_read_stop_signal() && state!=STATE_STARTUP){
             timerReset(&timer);
             clear_all_order_lights();
             hardware_command_stop_light(1);
