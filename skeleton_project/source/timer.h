@@ -26,7 +26,7 @@ bool timerTrigger(Timer* timer_p, int trigger);
 /**
  * @brief resets timer by setting @c timestamp to current time
  * 
- * @param timer we want to reset
+ * @param timer_p pointer to the timer we want to reset
  */
 void timerReset(Timer* timer_p);
 
