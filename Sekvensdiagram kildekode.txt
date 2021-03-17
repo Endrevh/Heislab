@@ -1,0 +1,83 @@
+title Sekvensdiagram
+
+participant Timer
+participant Controller
+participant Elevator FSM
+participant Hardware
+
+Elevator FSM-->Elevator FSM: state = idle
+Elevator FSM->Controller: check order buttons
+activate Elevator FSM
+
+//deaktiver FSM når den ikke brukes selv om løkken kjører?
+activate Controller
+Controller->Hardware: read order button
+activate Hardware
+Elevator FSM->Hardware: light on 1F UP
+Hardware-->Controller: request 1F UP
+deactivate Hardware
+Controller->Controller: handle request, add to Q
+Controller-->Elevator FSM: state DOWN
+deactivate Controller
+Elevator FSM->Hardware: movement down
+deactivate Elevator FSM
+activate Hardware
+Elevator FSM->Controller: check if elevator at floor
+activate Elevator FSM
+activate Controller
+Controller->Hardware: read floor sensor
+Hardware-->Controller: first floor
+Controller->Controller: check if stop
+Controller-->Elevator FSM: state DOWN_HALT
+Elevator FSM->Hardware: movement stop
+deactivate Elevator FSM
+Controller->Hardware: open door, light off 1F UP
+deactivate Hardware
+Controller->Timer: reset timer
+deactivate Controller
+activate Timer
+Elevator FSM->Controller: check order buttons
+activate Elevator FSM
+activate Controller
+Controller->Hardware: read order button
+activate Hardware
+Elevator FSM->Hardware: light on 4F inside
+Hardware-->Controller: request 4F inside
+deactivate Hardware
+Controller->Controller: handle request, add to Q
+Timer-->Elevator FSM: timer trigger
+deactivate Timer
+Elevator FSM->Controller: calc new direction
+Controller->Controller: delete 1F UP from Q
+Controller->Hardware: close door
+activate Hardware
+Controller-->Elevator FSM: state UP
+deactivate Controller
+Elevator FSM->Hardware: movement up
+deactivate Elevator FSM
+Elevator FSM->Controller: Check if elevator at floor
+activate Elevator FSM
+activate Controller
+Controller->Hardware: read floor sensor
+Hardware-->Controller: fourth floor
+Controller->Controller: check if stop
+Controller-->Elevator FSM: state UP_HALT
+Elevator FSM->Hardware: movement stop
+deactivate Elevator FSM
+Controller->Hardware: open door, light off 4F inside
+deactivate Hardware
+Controller->Timer: reset timer
+deactivate Controller
+activate Timer
+Timer-->Elevator FSM: timer trigger
+activate Elevator FSM
+deactivate Timer
+Elevator FSM->Controller: calc new direction
+activate Controller
+Controller->Controller: delete 4F inside from Q
+Controller->Hardware: close door
+activate Hardware
+Controller-->Elevator FSM: state IDLE
+deactivate Elevator FSM
+deactivate Controller
+deactivate Hardware
