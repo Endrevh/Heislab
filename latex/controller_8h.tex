@@ -1,0 +1,251 @@
+\hypertarget{controller_8h}{}\doxysection{skeleton\+\_\+project/source/controller.h File Reference}
+\label{controller_8h}\index{skeleton\_project/source/controller.h@{skeleton\_project/source/controller.h}}
+
+
+Queuesystem-\/ and elevator control related logic.  
+
+
+{\ttfamily \#include \char`\"{}hardware.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}timer.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}stdlib.\+h\char`\"{}}\newline
+{\ttfamily \#include $<$stdbool.\+h$>$}\newline
+\doxysubsection*{Data Structures}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structcommand}{command}}
+\begin{DoxyCompactList}\small\item\em contains commands from each floor Contains three bools representing the order types from {\ttfamily order\+Type} \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{structrequest}{request}}
+\begin{DoxyCompactList}\small\item\em represents an elevator-\/request containing floor number and order type \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{controller_8h_ab5fb650332a7a04e276972e733c98780}\label{controller_8h_ab5fb650332a7a04e276972e733c98780}} 
+\#define {\bfseries CONTROLLER\+\_\+H}
+\item 
+\mbox{\Hypertarget{controller_8h_acfcc1df69f6023074603ac66e27561af}\label{controller_8h_acfcc1df69f6023074603ac66e27561af}} 
+\#define {\bfseries NUMBER\+\_\+\+OF\+\_\+\+ORDER\+\_\+\+TYPES}~3
+\item 
+\mbox{\Hypertarget{controller_8h_a9e1f664b9478c1fa463c47264f0e0a3b}\label{controller_8h_a9e1f664b9478c1fa463c47264f0e0a3b}} 
+\#define {\bfseries FLOOR\+\_\+\+WAIT\+\_\+\+TIME}~3
+\end{DoxyCompactItemize}
+\doxysubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{controller_8h_a7508a308f3fd112a96282659431be20f}\label{controller_8h_a7508a308f3fd112a96282659431be20f}} 
+enum \mbox{\hyperlink{controller_8h_a7508a308f3fd112a96282659431be20f}{order\+Type}} \{ {\bfseries ORDER\+\_\+\+UP} = 0
+, {\bfseries ORDER\+\_\+\+INSIDE}
+, {\bfseries ORDER\+\_\+\+DOWN}
+ \}
+\begin{DoxyCompactList}\small\item\em Types of orders. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{controller_8h_acd367487f07fca9e254fc824e3e611a8}\label{controller_8h_acd367487f07fca9e254fc824e3e611a8}} 
+enum \mbox{\hyperlink{controller_8h_acd367487f07fca9e254fc824e3e611a8}{elevator\+\_\+state}} \{ \newline
+{\bfseries STATE\+\_\+\+STARTUP} = 1
+, {\bfseries STATE\+\_\+\+UP}
+, {\bfseries STATE\+\_\+\+UP\+\_\+\+HALT}
+, {\bfseries STATE\+\_\+\+DOWN}
+, \newline
+{\bfseries STATE\+\_\+\+DOWN\+\_\+\+HALT}
+, {\bfseries STATE\+\_\+\+IDLE}
+, {\bfseries STATE\+\_\+\+EMERGENCY\+\_\+\+STOP}
+ \}
+\begin{DoxyCompactList}\small\item\em contains the elevator states \end{DoxyCompactList}\item 
+enum \mbox{\hyperlink{controller_8h_a51cb2d8e3786586169fd0cafdf6eede4}{emergency\+\_\+types}} \{ {\bfseries EMERGENCY\+\_\+\+HANDLED}
+, {\bfseries EMERGENCY\+\_\+\+ABOVE}
+, {\bfseries EMERGENCY\+\_\+\+BELOW}
+ \}
+\begin{DoxyCompactList}\small\item\em contains the emergency types \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{controller_8h_ac0f5f61918f0fa26799e58af3aa2daec}{controller\+Check\+Order\+Btns}} (void)
+\begin{DoxyCompactList}\small\item\em polls order buttons and creates associated requests \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{controller_8h_aea4fc26092e988ce7f334fefe3909ae1}{controller\+Request\+Between}} (int floor\+\_\+lower, int floor\+\_\+upper)
+\begin{DoxyCompactList}\small\item\em checks for requests between given floors \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{controller_8h_a95e1693386faeb9acde49f53fb67cc84}{controller\+Request\+Handler}} (\mbox{\hyperlink{structrequest}{request}} $\ast$p\+\_\+request)
+\begin{DoxyCompactList}\small\item\em adds request to queue and also changes elevator state if in {\ttfamily STATE\+\_\+\+IDLE} or {\ttfamily STATE\+\_\+\+EMERGENCY\+\_\+\+STOP} \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{controller_8h_ad9beb9687c3859e197650b47ace433c5}{controller\+Del\+From\+Queue}} (int floor)
+\begin{DoxyCompactList}\small\item\em deletes all orders from given floor \end{DoxyCompactList}\item 
+\mbox{\hyperlink{controller_8h_acd367487f07fca9e254fc824e3e611a8}{elevator\+\_\+state}} \mbox{\hyperlink{controller_8h_aacea1bcd054ad328182960dfc5982e5e}{controller\+New\+Dir}} (void)
+\begin{DoxyCompactList}\small\item\em calculates new elevator state based on queue, current floor and current state. This function is called after {\ttfamily FLOOR\+\_\+\+WAIT\+\_\+\+TIME} seconds stop to allow new passengers to first choose desired floor. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{controller_8h_a50cb75f32fa776923876daa57ec9986c}{controller\+Stop\+At\+Floor}} (int floor)
+\begin{DoxyCompactList}\small\item\em decides if the elevator stops at passing floor and if so, changes state to {\ttfamily STATE\+\_\+\+UP\+\_\+\+HALT} or {\ttfamily STATE\+\_\+\+DOWN\+\_\+\+HALT} \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{controller_8h_a9bc06b7adb1a139bbec60a209bd96daa}\label{controller_8h_a9bc06b7adb1a139bbec60a209bd96daa}} 
+void \mbox{\hyperlink{controller_8h_a9bc06b7adb1a139bbec60a209bd96daa}{controller\+Arrived}} (void)
+\begin{DoxyCompactList}\small\item\em Functionality when elevator arrives at floor. This will reset timer, open door and turn off order lights. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{controller_8h_a1fd05ad7f68507c07635d3f9931d4d58}\label{controller_8h_a1fd05ad7f68507c07635d3f9931d4d58}} 
+void \mbox{\hyperlink{controller_8h_a1fd05ad7f68507c07635d3f9931d4d58}{controller\+Depart}} (void)
+\begin{DoxyCompactList}\small\item\em Functionality when elevator departs from floor Closes door, deletes orders from departing floor. Also turns off order lights again at {\ttfamily current\+\_\+floor} in case of new orders while at floor. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{controller_8h_aa80bf7b456b2101f119e8b4a22624de6}\label{controller_8h_aa80bf7b456b2101f119e8b4a22624de6}} 
+void \mbox{\hyperlink{controller_8h_aa80bf7b456b2101f119e8b4a22624de6}{controller\+Emergency\+Handler}} (void)
+\begin{DoxyCompactList}\small\item\em handles emergency-\/related logic. This is implemented to prevent disorientation when in an emergency \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{controller_8h_ac2b21d77dee08f9df5e17c06b2ccc951}{controller\+Elevator\+At\+Floor}} (void)
+\begin{DoxyCompactList}\small\item\em Checks if the elevator is at a floor. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{controller_8h_af930e9db11b23d6a13f1938e54f6c778}\label{controller_8h_af930e9db11b23d6a13f1938e54f6c778}} 
+\mbox{\hyperlink{controller_8h_acd367487f07fca9e254fc824e3e611a8}{elevator\+\_\+state}} {\bfseries state}
+\item 
+\mbox{\Hypertarget{controller_8h_a950579435b4a5ecf3445b1753f827699}\label{controller_8h_a950579435b4a5ecf3445b1753f827699}} 
+\mbox{\hyperlink{controller_8h_a51cb2d8e3786586169fd0cafdf6eede4}{emergency\+\_\+types}} {\bfseries emergency\+\_\+status}
+\item 
+\mbox{\Hypertarget{controller_8h_a53f0cf8d6c7426344a7336af4b06925a}\label{controller_8h_a53f0cf8d6c7426344a7336af4b06925a}} 
+int {\bfseries current\+\_\+floor}
+\item 
+\mbox{\Hypertarget{controller_8h_a571dfabd2d182e892ef52a7ec2358849}\label{controller_8h_a571dfabd2d182e892ef52a7ec2358849}} 
+\mbox{\hyperlink{structcommand}{command}} {\bfseries Queue} \mbox{[}HARDWARE\+\_\+\+NUMBER\+\_\+\+OF\+\_\+\+FLOORS\mbox{]}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Queuesystem-\/ and elevator control related logic. 
+
+Lars Rønhaug Pettersen, Endre Vee Hagestuen 
+
+\doxysubsection{Enumeration Type Documentation}
+\mbox{\Hypertarget{controller_8h_a51cb2d8e3786586169fd0cafdf6eede4}\label{controller_8h_a51cb2d8e3786586169fd0cafdf6eede4}} 
+\index{controller.h@{controller.h}!emergency\_types@{emergency\_types}}
+\index{emergency\_types@{emergency\_types}!controller.h@{controller.h}}
+\doxysubsubsection{\texorpdfstring{emergency\_types}{emergency\_types}}
+{\footnotesize\ttfamily enum \mbox{\hyperlink{controller_8h_a51cb2d8e3786586169fd0cafdf6eede4}{emergency\+\_\+types}}}
+
+
+
+contains the emergency types 
+
+If the elevator is not in an emergency, the status will be {\ttfamily EMERGENCY\+\_\+\+HANDLED} 
+
+Definition at line 66 of file controller.\+h.
+
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{controller_8h_ac0f5f61918f0fa26799e58af3aa2daec}\label{controller_8h_ac0f5f61918f0fa26799e58af3aa2daec}} 
+\index{controller.h@{controller.h}!controllerCheckOrderBtns@{controllerCheckOrderBtns}}
+\index{controllerCheckOrderBtns@{controllerCheckOrderBtns}!controller.h@{controller.h}}
+\doxysubsubsection{\texorpdfstring{controllerCheckOrderBtns()}{controllerCheckOrderBtns()}}
+{\footnotesize\ttfamily void controller\+Check\+Order\+Btns (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+polls order buttons and creates associated requests 
+
+If an order is found and a request is created, the request is passed to {\ttfamily controller\+Request\+Handler} 
+
+Definition at line 7 of file controller.\+c.
+
+\mbox{\Hypertarget{controller_8h_ad9beb9687c3859e197650b47ace433c5}\label{controller_8h_ad9beb9687c3859e197650b47ace433c5}} 
+\index{controller.h@{controller.h}!controllerDelFromQueue@{controllerDelFromQueue}}
+\index{controllerDelFromQueue@{controllerDelFromQueue}!controller.h@{controller.h}}
+\doxysubsubsection{\texorpdfstring{controllerDelFromQueue()}{controllerDelFromQueue()}}
+{\footnotesize\ttfamily void controller\+Del\+From\+Queue (\begin{DoxyParamCaption}\item[{int}]{floor }\end{DoxyParamCaption})}
+
+
+
+deletes all orders from given floor 
+
+
+\begin{DoxyParams}{Parameters}
+{\em floor} & floor to delete orders from \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 97 of file controller.\+c.
+
+\mbox{\Hypertarget{controller_8h_ac2b21d77dee08f9df5e17c06b2ccc951}\label{controller_8h_ac2b21d77dee08f9df5e17c06b2ccc951}} 
+\index{controller.h@{controller.h}!controllerElevatorAtFloor@{controllerElevatorAtFloor}}
+\index{controllerElevatorAtFloor@{controllerElevatorAtFloor}!controller.h@{controller.h}}
+\doxysubsubsection{\texorpdfstring{controllerElevatorAtFloor()}{controllerElevatorAtFloor()}}
+{\footnotesize\ttfamily int controller\+Elevator\+At\+Floor (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+Checks if the elevator is at a floor. 
+
+\begin{DoxyReturn}{Returns}
+floor number if success, 0 if no floor 
+\end{DoxyReturn}
+
+
+Definition at line 192 of file controller.\+c.
+
+\mbox{\Hypertarget{controller_8h_aacea1bcd054ad328182960dfc5982e5e}\label{controller_8h_aacea1bcd054ad328182960dfc5982e5e}} 
+\index{controller.h@{controller.h}!controllerNewDir@{controllerNewDir}}
+\index{controllerNewDir@{controllerNewDir}!controller.h@{controller.h}}
+\doxysubsubsection{\texorpdfstring{controllerNewDir()}{controllerNewDir()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{controller_8h_acd367487f07fca9e254fc824e3e611a8}{elevator\+\_\+state}} controller\+New\+Dir (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+calculates new elevator state based on queue, current floor and current state. This function is called after {\ttfamily FLOOR\+\_\+\+WAIT\+\_\+\+TIME} seconds stop to allow new passengers to first choose desired floor. 
+
+\begin{DoxyReturn}{Returns}
+returns elevator state. Possible return values are {\ttfamily STATE\+\_\+\+IDLE}, {\ttfamily STATE\+\_\+\+UP} and {\ttfamily STATE\+\_\+\+DOWN} 
+\end{DoxyReturn}
+
+
+Definition at line 103 of file controller.\+c.
+
+\mbox{\Hypertarget{controller_8h_aea4fc26092e988ce7f334fefe3909ae1}\label{controller_8h_aea4fc26092e988ce7f334fefe3909ae1}} 
+\index{controller.h@{controller.h}!controllerRequestBetween@{controllerRequestBetween}}
+\index{controllerRequestBetween@{controllerRequestBetween}!controller.h@{controller.h}}
+\doxysubsubsection{\texorpdfstring{controllerRequestBetween()}{controllerRequestBetween()}}
+{\footnotesize\ttfamily bool controller\+Request\+Between (\begin{DoxyParamCaption}\item[{int}]{floor\+\_\+lower,  }\item[{int}]{floor\+\_\+upper }\end{DoxyParamCaption})}
+
+
+
+checks for requests between given floors 
+
+
+\begin{DoxyParams}{Parameters}
+{\em floor\+\_\+lower} & lowest floor checked \\
+\hline
+{\em floor\+\_\+upper} & highest floor checked\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+returns true if any request is found, returns false otherwise 
+\end{DoxyReturn}
+
+
+Definition at line 22 of file controller.\+c.
+
+\mbox{\Hypertarget{controller_8h_a95e1693386faeb9acde49f53fb67cc84}\label{controller_8h_a95e1693386faeb9acde49f53fb67cc84}} 
+\index{controller.h@{controller.h}!controllerRequestHandler@{controllerRequestHandler}}
+\index{controllerRequestHandler@{controllerRequestHandler}!controller.h@{controller.h}}
+\doxysubsubsection{\texorpdfstring{controllerRequestHandler()}{controllerRequestHandler()}}
+{\footnotesize\ttfamily void controller\+Request\+Handler (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structrequest}{request}} $\ast$}]{p\+\_\+request }\end{DoxyParamCaption})}
+
+
+
+adds request to queue and also changes elevator state if in {\ttfamily STATE\+\_\+\+IDLE} or {\ttfamily STATE\+\_\+\+EMERGENCY\+\_\+\+STOP} 
+
+
+\begin{DoxyParams}{Parameters}
+{\em p\+\_\+request} & pointer to request of type {\ttfamily request} \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 30 of file controller.\+c.
+
+\mbox{\Hypertarget{controller_8h_a50cb75f32fa776923876daa57ec9986c}\label{controller_8h_a50cb75f32fa776923876daa57ec9986c}} 
+\index{controller.h@{controller.h}!controllerStopAtFloor@{controllerStopAtFloor}}
+\index{controllerStopAtFloor@{controllerStopAtFloor}!controller.h@{controller.h}}
+\doxysubsubsection{\texorpdfstring{controllerStopAtFloor()}{controllerStopAtFloor()}}
+{\footnotesize\ttfamily void controller\+Stop\+At\+Floor (\begin{DoxyParamCaption}\item[{int}]{floor }\end{DoxyParamCaption})}
+
+
+
+decides if the elevator stops at passing floor and if so, changes state to {\ttfamily STATE\+\_\+\+UP\+\_\+\+HALT} or {\ttfamily STATE\+\_\+\+DOWN\+\_\+\+HALT} 
+
+
+\begin{DoxyParams}{Parameters}
+{\em floor} & equals the passing floor, 0 if undefined floor \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 130 of file controller.\+c.
+
